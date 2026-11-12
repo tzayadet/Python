@@ -8,7 +8,8 @@ Original file is located at
 """
 
 # 📦 Instala la librería si no está instalada (solo necesario en Colab o entornos nuevos)
-!pip install cryptography ipywidgets
+# In Colab, install dependencies in a separate notebook cell:
+# %pip install cryptography ipywidgets
 
 """# Prueba de esfuerzo
 
