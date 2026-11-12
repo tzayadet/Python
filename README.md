@@ -54,7 +54,7 @@ python nombre_del_script.py
 
 ## Organización y madurez
 
-Este repositorio funciona como espacio de trabajo y archivo de prácticas. Los proyectos pueden tener dependencias, requisitos y niveles de madurez distintos. No todos los scripts son aplicaciones listas para producción; revisa el README específico y el código antes de utilizarlos.
+Este repositorio funciona como espacio de trabajo y archivo de prácticas. Los proyectos pueden tener dependencias, requisitos y niveles de madurez distintos. Los materiales históricos no ejecutables se conservan en `archive/` y quedan fuera de la validación de código. No todos los scripts son aplicaciones listas para producción; revisa el README específico y el código antes de utilizarlos.
 
 ## Tecnologías
 
