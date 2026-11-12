@@ -31,7 +31,7 @@ Repositorio personal de aprendizaje y desarrollo en Python. Reúne ejercicios, s
 | Proyecto | Descripción | Estado |
 |---|---|---|
 | [Comparador de documentos](comparador_documentos.py) | Compara TXT, DOCX, RTF y PDF; genera un informe HTML con diferencias y métricas. | CLI con pruebas unitarias |
-| [Conversor Python a EXE](Python2ExeConVerTer_GUI.py) | Interfaz Tkinter para empaquetar scripts con PyInstaller. | Utilidad de escritorio |
+| [Conversor Python a EXE](python_to_exe_gui.py) | Interfaz Tkinter para empaquetar scripts con PyInstaller; ejecuta el proceso en segundo plano y mantiene las actualizaciones de interfaz en el hilo principal. | Utilidad de escritorio |
 | [Automatización de KPI de RR. HH.](HR_ETL_KPI_scripting.py) | Procesamiento de datos Excel y generación de indicadores e informes. | Script dependiente de libro de entrada |
 
 ### Comparador de documentos
