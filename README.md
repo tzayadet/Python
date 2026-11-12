@@ -54,7 +54,7 @@ Para elegir la ruta del informe:
 python comparador_documentos.py documento_a.pdf documento_b.pdf --output diferencias.html
 ```
 
-Los formatos PDF, DOCX y RTF requieren sus dependencias Python. Para documentos DOC antiguos también hace falta Pandoc instalado en el sistema.
+Los formatos PDF, DOCX y RTF requieren sus dependencias Python. Para documentos DOC antiguos también hace falta Pandoc instalado en el sistema. El comparador no sobrescribe documentos de entrada y exige `--force` para sustituir un informe HTML existente.
 
 ## Entorno de desarrollo
 
