@@ -26,6 +26,36 @@ Repositorio personal de aprendizaje y desarrollo en Python. Reúne ejercicios, s
 | **Datos** | Procesamiento, consultas, ficheros y generación de informes. |
 | **Experimentación** | Prototipos y pruebas de concepto independientes. |
 
+## Aplicaciones y utilidades destacadas
+
+| Proyecto | Descripción | Estado |
+|---|---|---|
+| [Comparador de documentos](comparador_documentos.py) | Compara TXT, DOCX, RTF y PDF; genera un informe HTML con diferencias y métricas. | CLI con pruebas unitarias |
+| [Conversor Python a EXE](Python2ExeConVerTer_GUI.py) | Interfaz Tkinter para empaquetar scripts con PyInstaller. | Utilidad de escritorio |
+| [Automatización de KPI de RR. HH.](HR_ETL_KPI_scripting.py) | Procesamiento de datos Excel y generación de indicadores e informes. | Script dependiente de libro de entrada |
+
+### Comparador de documentos
+
+Instala las dependencias:
+
+```bash
+python -m pip install -r requirements-comparador-documentos.txt
+```
+
+Para comparar dos documentos:
+
+```bash
+python comparador_documentos.py contrato_v1.docx contrato_v2.docx
+```
+
+Para elegir la ruta del informe:
+
+```bash
+python comparador_documentos.py documento_a.pdf documento_b.pdf --output diferencias.html
+```
+
+Los formatos PDF, DOCX y RTF requieren sus dependencias Python. Para documentos DOC antiguos también hace falta Pandoc instalado en el sistema.
+
 ## Entorno de desarrollo
 
 Se recomienda Python 3 y un entorno virtual por proyecto:
