@@ -98,3 +98,9 @@ Este repositorio funciona como espacio de trabajo y archivo de prácticas. Los p
 ## Licencia
 
 MIT. Consulta [LICENSE](LICENSE).
+
+## Project showcase
+
+[Open the GitHub Pages showcase](https://tzayadet.github.io/Python/) · [Showcase source](docs/index.html)
+
+The page is a curated index of selected source files; it does not execute Python or Java in the browser. To publish it, select **Settings → Pages → Build and deployment → Source → GitHub Actions** and set the repository Actions variable `ENABLE_PAGES=true` under **Settings → Secrets and variables → Actions → Variables**. The workflow remains skipped until that variable is enabled.
