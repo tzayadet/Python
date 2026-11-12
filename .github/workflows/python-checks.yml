@@ -26,4 +26,4 @@ jobs:
         with:
           python-version: "3.12"
       - name: Compile Python sources
-        run: python -m compileall -q -x FirmaAutomatizadaALPHA .
+        run: python -m compileall -q .
