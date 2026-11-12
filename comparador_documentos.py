@@ -14,7 +14,7 @@ Características:
 - Manejo robusto de errores
 - Interfaz de línea de comandos amigable
 
-Autor: Claude AI
+Proyecto personal de aprendizaje y automatización
 Fecha: 2025
 """
 
@@ -337,7 +337,7 @@ class DocumentComparator:
             if line.startswith('+++') or line.startswith('---'):
                 continue
             elif line.startswith('@@'):
-                diff_content.append(f'<div class="line-number">Línea {line_number}</div>')
+                diff_content.append(f'<div class="line-number">{html.escape(line)}</div>')
                 continue
             elif line.startswith('+'):
                 added_lines += 1
@@ -364,8 +364,10 @@ class DocumentComparator:
         
         return '\n'.join(diff_content), stats
     
-    def compare_documents(self, file1: str, file2: str, output_file: str = None) -> str:
-        """Compara dos documentos y genera un reporte HTML"""
+    def compare_documents(
+        self, file1: str, file2: str, output_file: str = None, overwrite: bool = False
+    ) -> str:
+        """Compara dos documentos y genera un reporte HTML sin sobrescribir entradas ni informes por accidente."""
         print(f"🔍 Leyendo documento 1: {file1}")
         try:
             text1 = DocumentReader.read_document(file1)
@@ -388,7 +390,17 @@ class DocumentComparator:
         # Generar nombre de archivo de salida si no se especifica
         if output_file is None:
             output_file = f"comparacion_{Path(file1).stem}_vs_{Path(file2).stem}.html"
-        
+
+        output_path = Path(output_file).expanduser()
+        resolved_output = output_path.resolve()
+        input_paths = {Path(file1).resolve(), Path(file2).resolve()}
+        if resolved_output in input_paths:
+            raise ValueError("El informe de salida no puede sobrescribir ninguno de los documentos de entrada.")
+        if output_path.exists() and not overwrite:
+            raise FileExistsError(
+                f"El informe ya existe: {output_path}. Usa --force para sobrescribirlo."
+            )
+
         # Generar HTML final
         from datetime import datetime
         html_output = self.html_template.format(
@@ -400,10 +412,10 @@ class DocumentComparator:
         )
         
         print(f"💾 Guardando reporte: {output_file}")
-        with open(output_file, 'w', encoding='utf-8') as f:
+        with output_path.open('w', encoding='utf-8') as f:
             f.write(html_output)
         
-        return output_file
+        return str(output_path)
 
 
 def print_requirements():
@@ -427,8 +439,8 @@ Formatos soportados:
   .pdf    - PDF (requiere PyPDF2)
 
 Ejemplos de uso:
-  python comparador.py documento1.docx documento2.docx
-  python comparador.py -o resultado.html archivo1.txt archivo2.txt
+  python comparador_documentos.py documento1.docx documento2.docx
+  python comparador_documentos.py -o resultado.html archivo1.txt archivo2.txt
   python comparador.py --requirements  # Mostrar dependencias
         '''
     )
@@ -436,6 +448,7 @@ Ejemplos de uso:
     parser.add_argument('file1', nargs='?', help='Primer documento a comparar')
     parser.add_argument('file2', nargs='?', help='Segundo documento a comparar')
     parser.add_argument('-o', '--output', help='Archivo de salida HTML')
+    parser.add_argument('--force', action='store_true', help='Sobrescribir un informe existente (nunca sobrescribe los documentos de entrada)')
     parser.add_argument('--requirements', action='store_true', 
                        help='Mostrar dependencias requeridas')
     
@@ -457,7 +470,7 @@ Ejemplos de uso:
     
     try:
         comparator = DocumentComparator()
-        output_file = comparator.compare_documents(args.file1, args.file2, args.output)
+        output_file = comparator.compare_documents(args.file1, args.file2, args.output, overwrite=args.force)
         
         print(f"\n✅ Comparación completada exitosamente!")
         print(f"📄 Reporte generado: {output_file}")
