@@ -3,8 +3,8 @@ def vocales(s):
     vocales = "aeiouAEIOU"
     # Inicializamos el contador de vocales
     contador = 0
-        for letra in s:
+    for letra in s:
         # Si la letra es una vocal, incrementamos el contador
         if letra in vocales:
             contador += 1
-        return contador
+    return contador
