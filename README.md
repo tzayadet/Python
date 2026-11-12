@@ -11,7 +11,7 @@
 
 # Python Projects
 
-[![Python syntax checks](https://github.com/tzayadet/Python/actions/workflows/python-checks.yml/badge.svg)](https://github.com/tzayadet/Python/actions/workflows/python-checks.yml)
+[![Python CI](https://github.com/tzayadet/Python/actions/workflows/python-checks.yml/badge.svg)](https://github.com/tzayadet/Python/actions/workflows/python-checks.yml)
 
 Repositorio personal de aprendizaje y desarrollo en Python. Reúne ejercicios, scripts, automatizaciones, utilidades y aplicaciones creadas durante distintas etapas de formación y práctica.
 
