@@ -3,6 +3,7 @@ from tkinter import ttk, filedialog, messagebox, scrolledtext
 import os
 import subprocess
 import threading
+import queue
 import sys
 from pathlib import Path
 
@@ -16,12 +17,15 @@ class PythonToExeConverter:
         # Variables
         self.selected_files = []
         self.output_dir = ""
+        self.events = queue.Queue()
+        self.conversion_running = False
         
         # Configurar estilo
         self.setup_style()
         
         # Crear interfaz
         self.create_widgets()
+        self.root.after(100, self.process_events)
         
         # Verificar PyInstaller
         self.check_pyinstaller()
@@ -163,25 +167,30 @@ class PythonToExeConverter:
                 self.install_pyinstaller()
     
     def install_pyinstaller(self):
-        """Instalar PyInstaller automáticamente"""
+        """Instalar PyInstaller sin bloquear ni manipular Tk desde el hilo secundario"""
+        self.progress.start()
+
         def install():
             try:
-                self.log_message("Instalando PyInstaller...")
-                self.progress.start()
-                result = subprocess.run([sys.executable, '-m', 'pip', 'install', 'pyinstaller'], 
-                                      capture_output=True, text=True)
-                self.progress.stop()
-                
+                self.events.put(("log", "Instalando PyInstaller..."))
+                result = subprocess.run(
+                    [sys.executable, "-m", "pip", "install", "pyinstaller"],
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                )
                 if result.returncode == 0:
-                    self.log_message("✓ PyInstaller instalado correctamente")
+                    self.events.put(("log", "✓ PyInstaller instalado correctamente"))
                 else:
-                    self.log_message(f"✗ Error instalando PyInstaller: {result.stderr}")
-            except Exception as e:
-                self.progress.stop()
-                self.log_message(f"✗ Error instalando PyInstaller: {str(e)}")
-        
+                    details = result.stderr.strip() or result.stdout.strip()
+                    self.events.put(("log", f"✗ Error instalando PyInstaller: {details[:500]}"))
+            except Exception as exc:
+                self.events.put(("log", f"✗ Error instalando PyInstaller: {exc}"))
+            finally:
+                self.events.put(("task_finished", None))
+
         threading.Thread(target=install, daemon=True).start()
-    
+
     def browse_files(self):
         """Examinar archivos Python"""
         files = filedialog.askopenfilenames(
@@ -224,6 +233,135 @@ class PythonToExeConverter:
             del self.selected_files[index]
             self.files_listbox.delete(index)
     
+    def browse_output_folder(self):
+        """Examinar carpeta de salida"""
+        folder = filedialog.askdirectory(title="Seleccionar carpeta de salida")
+        if folder:
+            self.output_dir = folder
+            self.output_var.set(folder)
+    
+    def log_message(self, message):
+        """Añadir mensajes desde cualquier hilo mediante una cola segura"""
+        if threading.current_thread() is threading.main_thread():
+            self._append_log(message)
+        else:
+            self.events.put(("log", message))
+
+    def _append_log(self, message):
+        self.log_text.config(state="normal")
+        self.log_text.insert(tk.END, f"{message}\\n")
+        self.log_text.see(tk.END)
+        self.log_text.config(state="disabled")
+
+    def process_events(self):
+        """Procesar eventos del worker siempre desde el hilo principal de Tk"""
+        try:
+            while True:
+                event, payload = self.events.get_nowait()
+                if event == "log":
+                    self._append_log(payload)
+                elif event == "task_finished":
+                    self.progress.stop()
+                elif event == "conversion_finished":
+                    successful, total, output_dir = payload
+                    self.progress.stop()
+                    self.convert_button.config(state="normal")
+                    self.conversion_running = False
+                    self._append_log("\\n=== Conversión completada ===")
+                    self._append_log(f"Exitosos: {successful}/{total}")
+                    self._append_log(f"Archivos EXE guardados en: {output_dir}")
+                    if successful:
+                        messagebox.showinfo(
+                            "Conversión completada",
+                            f"Se convirtieron {successful} de {total} archivos exitosamente.\\n"
+                            f"Los archivos EXE están en: {output_dir}",
+                        )
+                    else:
+                        messagebox.showerror(
+                            "Conversión fallida",
+                            "No se pudo convertir ningún archivo. Revisa el log para más detalles.",
+                        )
+        except queue.Empty:
+            pass
+        finally:
+            self.root.after(100, self.process_events)
+
+    def start_conversion(self):
+        """Iniciar la conversión con una instantánea de opciones de la interfaz"""
+        if self.conversion_running:
+            return
+        if not self.selected_files:
+            messagebox.showwarning("Sin archivos", "Por favor selecciona al menos un archivo Python.")
+            return
+        if not self.output_dir or not Path(self.output_dir).is_dir():
+            messagebox.showwarning("Carpeta no válida", "Selecciona una carpeta de salida existente.")
+            return
+
+        selected_files = list(self.selected_files)
+        output_dir = self.output_dir
+        onefile = self.onefile_var.get()
+        noconsole = self.noconsole_var.get()
+
+        self.conversion_running = True
+        self.convert_button.config(state="disabled")
+        self.progress.start()
+
+        thread = threading.Thread(
+            target=self.convert_files,
+            args=(selected_files, output_dir, onefile, noconsole),
+            daemon=True,
+        )
+        thread.start()
+
+    def convert_files(self, selected_files, output_dir, onefile, noconsole):
+        """Ejecutar PyInstaller en segundo plano sin acceder a widgets Tk"""
+        successful_conversions = 0
+        total_files = len(selected_files)
+        self.events.put(("log", f"Iniciando conversión de {total_files} archivo(s)..."))
+
+        for index, file_path in enumerate(selected_files, 1):
+            try:
+                self.events.put(("log", f"[{index}/{total_files}] Procesando: {os.path.basename(file_path)}"))
+                source = Path(file_path).expanduser().resolve()
+                if not source.is_file() or source.suffix.lower() != ".py":
+                    self.events.put(("log", f"✗ Archivo Python no válido: {file_path}"))
+                    continue
+
+                command = [sys.executable, "-m", "PyInstaller"]
+                if onefile:
+                    command.append("--onefile")
+                if noconsole:
+                    command.append("--noconsole")
+
+                build_root = Path(output_dir) / ".pyinstaller-build" / source.stem
+                spec_root = Path(output_dir) / ".pyinstaller-spec"
+                command.extend([
+                    "--distpath", output_dir,
+                    "--workpath", str(build_root),
+                    "--specpath", str(spec_root),
+                    "--clean",
+                    str(source),
+                ])
+
+                result = subprocess.run(
+                    command,
+                    capture_output=True,
+                    text=True,
+                    cwd=str(source.parent),
+                    check=False,
+                )
+
+                if result.returncode == 0:
+                    successful_conversions += 1
+                    self.events.put(("log", f"✓ {source.name} convertido correctamente"))
+                else:
+                    details = result.stderr.strip() or result.stdout.strip()
+                    self.events.put(("log", f"✗ Error convirtiendo {source.name}: {details[-1200:]}"))
+            except Exception as exc:
+                self.events.put(("log", f"✗ Excepción procesando {os.path.basename(file_path)}: {exc}"))
+
+        self.events.put(("conversion_finished", (successful_conversions, total_files, output_dir)))
+
     def browse_output_folder(self):
         """Examinar carpeta de salida"""
         folder = filedialog.askdirectory(title="Seleccionar carpeta de salida")
