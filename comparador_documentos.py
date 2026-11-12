@@ -95,7 +95,7 @@ class DocumentReader:
         with open(filepath, 'rb') as f:
             pdf_reader = PyPDF2.PdfReader(f)
             for page in pdf_reader.pages:
-                text.append(page.extract_text())
+                text.append(page.extract_text() or "")
         return '\n'.join(text)
     
     @staticmethod
@@ -393,8 +393,8 @@ class DocumentComparator:
         from datetime import datetime
         html_output = self.html_template.format(
             diff_content=diff_content,
-            file1=os.path.basename(file1),
-            file2=os.path.basename(file2),
+            file1=html.escape(os.path.basename(file1)),
+            file2=html.escape(os.path.basename(file2)),
             timestamp=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             **stats
         )
@@ -452,8 +452,8 @@ Ejemplos de uso:
     # Verificar que los archivos existen
     for filepath in [args.file1, args.file2]:
         if not os.path.exists(filepath):
-            print(f"❌ Error: El archivo '{filepath}' no existe")
-            return
+            print(f"❌ Error: El archivo '{filepath}' no existe", file=sys.stderr)
+            sys.exit(2)
     
     try:
         comparator = DocumentComparator()
