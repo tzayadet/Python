@@ -12,7 +12,9 @@ A working collection of Python exercises, scripts, automation workflows and desk
   <a href="https://github.com/tzayadet/Python"><strong>SOURCE CODE</strong></a>
 </p>
 
-[![Python CI](https://github.com/tzayadet/Python/actions/workflows/python-checks.yml/badge.svg)](https://github.com/tzayadet/Python/actions/workflows/python-checks.yml)
+[![Python CI](https://github.com/tzayadet/Python/actions/workflows/python-checks.yml/badge.svg)](https://github.com/tzayadet/Python/actions/workflows/python-checks.yml) · [![Pages](https://github.com/tzayadet/Python/actions/workflows/pages.yml/badge.svg)](https://github.com/tzayadet/Python/actions/workflows/pages.yml)
+
+**Showcase:** [Python Projects](https://tzayadet.github.io/Python/) · [Source](docs/index.html)
 
 ## Selected projects
 
