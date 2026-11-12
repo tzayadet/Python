@@ -173,8 +173,18 @@ class PythonToExeConverter:
         def install():
             try:
                 self.events.put(("log", "Instalando PyInstaller..."))
+                requirements = Path(__file__).resolve().with_name(
+                    "requirements-python-to-exe.txt"
+                )
+                if not requirements.is_file():
+                    raise FileNotFoundError(
+                        f"No se encuentra el manifiesto de dependencias: {requirements}"
+                    )
                 result = subprocess.run(
-                    [sys.executable, "-m", "pip", "install", "pyinstaller"],
+                    [
+                        sys.executable, "-m", "pip", "install",
+                        "-r", str(requirements),
+                    ],
                     capture_output=True,
                     text=True,
                     check=False,
