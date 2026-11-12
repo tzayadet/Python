@@ -63,6 +63,6 @@ Este repositorio funciona como espacio de trabajo y archivo de prácticas. Los p
 - APIs y servicios web
 - Testing y control de versiones
 
-## ## Licencia
+## Licencia
 
 MIT. Consulta [LICENSE](LICENSE).
