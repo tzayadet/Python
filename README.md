@@ -63,10 +63,6 @@ Este repositorio funciona como espacio de trabajo y archivo de prácticas. Los p
 - APIs y servicios web
 - Testing y control de versiones
 
-## Historial visual
-
-El archivo [Readme.md](Readme.md) conserva una versión visual anterior del repositorio. El presente `README.md` es la documentación técnica principal.
-
-## Licencia
+## ## Licencia
 
 MIT. Consulta [LICENSE](LICENSE).
