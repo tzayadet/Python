@@ -49,6 +49,49 @@ class DocumentComparatorTests(unittest.TestCase):
             self.assertIn("&lt;script&gt;.txt", report)
             self.assertNotIn("<p><strong>Documento 2:</strong> <script>", report)
 
+    def test_output_cannot_overwrite_an_input_document(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            source_a = Path(tmp) / "original.txt"
+            source_b = Path(tmp) / "other.txt"
+            source_a.write_text("original", encoding="utf-8")
+            source_b.write_text("other", encoding="utf-8")
+
+            with self.assertRaises(ValueError):
+                self.comparator.compare_documents(
+                    str(source_a), str(source_b), str(source_a)
+                )
+
+            self.assertEqual(source_a.read_text(encoding="utf-8"), "original")
+
+    def test_existing_report_requires_explicit_overwrite(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            source_a = Path(tmp) / "a.txt"
+            source_b = Path(tmp) / "b.txt"
+            output = Path(tmp) / "report.html"
+            source_a.write_text("alpha", encoding="utf-8")
+            source_b.write_text("beta", encoding="utf-8")
+            output.write_text("keep me", encoding="utf-8")
+
+            with self.assertRaises(FileExistsError):
+                self.comparator.compare_documents(
+                    str(source_a), str(source_b), str(output)
+                )
+            self.assertEqual(output.read_text(encoding="utf-8"), "keep me")
+
+    def test_force_allows_overwriting_an_existing_report(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            source_a = Path(tmp) / "a.txt"
+            source_b = Path(tmp) / "b.txt"
+            output = Path(tmp) / "report.html"
+            source_a.write_text("alpha", encoding="utf-8")
+            source_b.write_text("beta", encoding="utf-8")
+            output.write_text("old report", encoding="utf-8")
+
+            self.comparator.compare_documents(
+                str(source_a), str(source_b), str(output), overwrite=True
+            )
+            self.assertIn("Comparación de Documentos", output.read_text(encoding="utf-8"))
+
 
 if __name__ == "__main__":
     unittest.main()
