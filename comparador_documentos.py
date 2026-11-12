@@ -328,10 +328,7 @@ class DocumentComparator:
         diff_content = []
         added_lines = 0
         removed_lines = 0
-        line_number = 0
-        
         for line in differ:
-            line_number += 1
             escaped_line = html.escape(line)
             
             if line.startswith('+++') or line.startswith('---'):
