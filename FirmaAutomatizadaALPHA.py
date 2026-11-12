@@ -88,11 +88,10 @@ logging  # Incluido en Python estándar
 # -*- coding: utf-8 -*-
 
 """
-Aplicación para Inserción Automatizada de Firmas en Documentos
-Autor: Imegami
-Versión: 1.1
-"""
-"""
+# Aplicación para inserción automatizada de firmas en documentos.
+# Autor: Imegami
+# Versión: 1.1
+
 
 import os
 import sys
