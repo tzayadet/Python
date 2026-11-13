@@ -19,8 +19,7 @@ concurrency:
 
 jobs:
   deploy:
-    if: ${{ github.event.repository.private == false && github.event.repository.has_pages == true }}
-    if: ${{ vars.ENABLE_PAGES == 'true' }}
+    if: ${{ github.event.repository.private == false && github.event.repository.has_pages == true && vars.ENABLE_PAGES == 'true' }}
     runs-on: ubuntu-latest
     environment:
       name: github-pages
