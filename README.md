@@ -8,7 +8,7 @@
 A working collection of Python exercises, scripts, automation workflows and desktop utilities. Projects are kept independent because they do not share one dependency set or release cycle.
 
 <p align="center">
-  <a href="https://tzayadet.github.io/Python/"><strong>PROJECT SHOWCASE ↗</strong></a> ·
+  <a href="https://tzayadet.github.io/Python/"><strong>LIVE DEMO ↗</strong></a> ·
   <a href="https://github.com/tzayadet/Python"><strong>SOURCE CODE</strong></a>
 </p>
 
